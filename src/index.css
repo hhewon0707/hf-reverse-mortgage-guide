@@ -2,41 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 기본 글자 크기 (어르신 접근성) */
-:root {
-  --font-size-base: 18px;
-  --font-size-lg: 20px;
-  --font-size-xl: 24px;
-}
-
-html {
-  font-size: var(--font-size-base);
-}
-
-/* 글자 크기 조절 클래스 */
-html[data-font-size="normal"] { font-size: 18px; }
-html[data-font-size="large"]  { font-size: 20px; }
-html[data-font-size="xlarge"] { font-size: 24px; }
-
-/* 최소 터치 영역 (어르신 접근성) */
-button, a, [role="button"] {
-  min-height: 48px;
-  min-width: 48px;
-}
-
-/* 포커스 스타일 (키보드 접근성) */
-:focus-visible {
-  outline: 3px solid #0066cc;
-  outline-offset: 2px;
-}
+/* 모드별 기준 글자 크기: 부모세대는 크게, 자녀세대는 촘촘하게 */
+html { font-size: 16px; scroll-behavior: smooth; }
+html[data-mode='parent'] { font-size: 20px; }
+html[data-mode='child'] { font-size: 16px; }
 
 body {
-  font-family: 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
-  color: #1a1a1a;
-  line-height: 1.7;
+  font-family: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+  background: #f6f7fa;
+  color: #172033;
+  line-height: 1.65;
+  word-break: keep-all;
 }
 
-/* 부드러운 스크롤 */
-html {
-  scroll-behavior: smooth;
+:focus-visible { outline: 3px solid #f97316; outline-offset: 2px; }
+
+@layer components {
+  .card { @apply bg-white rounded-3xl shadow-card p-6 md:p-8; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-2xl font-bold transition-all px-6 py-3.5 min-h-[48px] active:scale-[0.98]; }
+  .btn-primary { @apply btn bg-brand-700 text-white hover:bg-brand-800; }
+  .btn-accent { @apply btn bg-warm-500 text-white shadow-pop hover:bg-warm-600; }
+  .btn-ghost { @apply btn bg-white text-brand-700 border border-brand-200 hover:bg-brand-50; }
+  .btn-disabled { @apply opacity-40 pointer-events-none; }
+  .opt { @apply w-full text-left rounded-2xl border-2 border-gray-200 bg-white px-5 py-4 font-semibold transition-all hover:border-brand-300; }
+  .opt-on { @apply border-brand-600 bg-brand-50 text-brand-800 ring-2 ring-brand-100; }
+  .chip { @apply inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-[0.8rem] font-semibold; }
+  .chip-warm { @apply inline-flex items-center gap-1 rounded-full bg-warm-50 text-warm-600 px-3 py-1 text-[0.8rem] font-semibold; }
+  .chip-safe { @apply inline-flex items-center gap-1 rounded-full bg-safe-50 text-safe-600 px-3 py-1 text-[0.8rem] font-semibold; }
+  .chip-gray { @apply inline-flex items-center gap-1 rounded-full bg-gray-100 text-gray-600 px-3 py-1 text-[0.8rem] font-semibold; }
+  .num { @apply font-extrabold tracking-tight tabular-nums; }
+  .input { @apply w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-3 text-base outline-none focus:border-brand-500; }
 }
+
+/* 부모세대 모드: 버튼 높이와 간격을 넓힘 */
+html[data-mode='parent'] .btn { padding-top: 1rem; padding-bottom: 1rem; min-height: 56px; }
+html[data-mode='parent'] .opt { padding-top: 1.1rem; padding-bottom: 1.1rem; }
+
+@keyframes slide-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+.slide-in { animation: slide-in 0.28s ease-out; }
+
+/* 슬라이더 */
+input[type='range'] { accent-color: #1a4aa6; width: 100%; height: 28px; }
