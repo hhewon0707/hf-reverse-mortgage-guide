@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 기본 글자 크기 (어르신 접근성) */
+:root {
+  --font-size-base: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+}
+
+html {
+  font-size: var(--font-size-base);
+}
+
+/* 글자 크기 조절 클래스 */
+html[data-font-size="normal"] { font-size: 18px; }
+html[data-font-size="large"]  { font-size: 20px; }
+html[data-font-size="xlarge"] { font-size: 24px; }
+
+/* 최소 터치 영역 (어르신 접근성) */
+button, a, [role="button"] {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* 포커스 스타일 (키보드 접근성) */
+:focus-visible {
+  outline: 3px solid #0066cc;
+  outline-offset: 2px;
+}
+
+body {
+  font-family: 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+  color: #1a1a1a;
+  line-height: 1.7;
+}
+
+/* 부드러운 스크롤 */
+html {
+  scroll-behavior: smooth;
+}
