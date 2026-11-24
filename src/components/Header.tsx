@@ -53,7 +53,7 @@ export default function Header() {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
+    <header className="no-print sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-16 gap-3">
           <Link to="/" className="flex items-center gap-2 font-extrabold text-brand-800 text-lg">

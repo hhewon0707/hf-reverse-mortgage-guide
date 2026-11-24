@@ -43,3 +43,11 @@ html[data-mode='parent'] .opt { padding-top: 1.1rem; padding-bottom: 1.1rem; }
 
 /* 슬라이더 */
 input[type='range'] { accent-color: #1a4aa6; width: 100%; height: 28px; }
+
+/* 인쇄: 내비게이션·버튼 숨기고 요약서만 출력 */
+@media print {
+  html, html[data-mode='parent'], html[data-mode='child'] { font-size: 14px; }
+  body { background: #fff; }
+  .no-print { display: none !important; }
+  .print-only-wrap { padding: 0 !important; max-width: none !important; margin: 0 !important; }
+}

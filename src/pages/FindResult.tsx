@@ -1,9 +1,30 @@
-import { useMemo, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useMode } from '../context/ModeContext'
 import SlideDeck, { type Slide } from '../components/SlideDeck'
 import Easy from '../components/Easy'
+import { SUMMARY_CSS, SummarySheet, summaryToHtml } from '../components/SummarySheet'
 import { estimate, fmtMan, fmtWon, type CheckStatus, type FindInput, type ProductStatus } from '../lib/estimate'
+import {
+  LEVEL_LABEL,
+  buildDocNotes,
+  buildDocuments,
+  buildSummary,
+  summaryToText,
+} from '../lib/documents'
+
+function download(name: string, content: string, type: string) {
+  // 한글이 깨지지 않도록 BOM 추가
+  const blob = new Blob(['\ufeff', content], { type: `${type};charset=utf-8` })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
 
 function SimBadge() {
   return <span className="chip-warm">참고용 시뮬레이션</span>
@@ -40,6 +61,49 @@ export default function FindResult({ input, onRestart }: { input: FindInput; onR
   const isChild = mode === 'child'
   const r = useMemo(() => estimate(input), [input])
   const isParentTarget = input.target === 'parent'
+  const docs = useMemo(() => buildDocuments(input, r), [input, r])
+  const docNotes = useMemo(() => buildDocNotes(input), [input])
+  const [checked, setChecked] = useState<Set<string>>(new Set())
+  const [showSummary, setShowSummary] = useState(false)
+
+  const toggleDoc = (id: string) =>
+    setChecked((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+
+  const summaryView = showSummary ? (() => {
+    const data = buildSummary(input, r, docs, checked, mode)
+    const stamp = new Date().toISOString().slice(0, 10)
+    return (
+      <div>
+        <style>{SUMMARY_CSS}</style>
+        <div className="no-print card mb-4">
+          <p className="font-extrabold text-brand-900 mb-1">📄 사전 상담 요약서</p>
+          <p className="text-sm text-gray-500 mb-4">
+            지사 상담 때 보여주시거나 가족에게 공유하세요. 이 파일은 내 기기에서만 만들어져요.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-2">
+            <button className="btn-accent !px-3" onClick={() => window.print()}>🖨️ 인쇄하기</button>
+            <button className="btn-primary !px-3" onClick={() => download(`주택연금_상담요약_${stamp}.html`, summaryToHtml(data), 'text/html')}>
+              💾 HTML 저장
+            </button>
+            <button className="btn-ghost !px-3" onClick={() => download(`주택연금_상담요약_${stamp}.txt`, summaryToText(data), 'text/plain')}>
+              📝 텍스트 저장
+            </button>
+          </div>
+          <button className="mt-3 text-sm font-bold text-brand-600 hover:underline" onClick={() => setShowSummary(false)}>
+            ← 결과로 돌아가기
+          </button>
+        </div>
+        <div className="rounded-3xl shadow-card overflow-hidden print:shadow-none">
+          <SummarySheet data={data} />
+        </div>
+      </div>
+    )
+  })() : null
 
   const overallInfo = {
     ok: { label: '가입 요건에 큰 문제는 없어 보여요', cls: 'chip-safe' },
@@ -318,6 +382,78 @@ export default function FindResult({ input, onRestart }: { input: FindInput; onR
     ),
   })
 
+  // 7-2) 신청 시 제출서류
+  const usable = docs.filter((d) => d.level !== 'na')
+  const doneCount = usable.filter((d) => checked.has(d.id)).length
+  const ordered = [...docs.filter((d) => d.level === 'required'), ...docs.filter((d) => d.level === 'maybe'), ...docs.filter((d) => d.level === 'na')]
+  slides.push({
+    key: 'docs',
+    label: '신청 시 제출서류',
+    node: (
+      <div>
+        <Title sub="내 조건에 맞춰 필요한 서류를 골라 보여드려요. 챙긴 서류는 체크해 두세요.">신청 시 제출서류</Title>
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <span className="chip-warm">필수 {docs.filter((d) => d.level === 'required').length}개</span>
+          <span className="chip">해당 가능 {docs.filter((d) => d.level === 'maybe').length}개</span>
+          <span className="chip-safe">챙김 {doneCount} / {usable.length}</span>
+        </div>
+        <div className="grid gap-2.5">
+          {ordered.map((d) => {
+            const na = d.level === 'na'
+            const box =
+              d.level === 'required'
+                ? 'border-warm-500 bg-warm-50/60'
+                : d.level === 'maybe'
+                  ? 'border-brand-300 bg-brand-50/50'
+                  : 'border-gray-200 bg-white opacity-55'
+            return (
+              <label key={d.id} className={`flex gap-3 rounded-2xl border-2 p-4 ${box} ${na ? '' : 'cursor-pointer'}`}>
+                <input
+                  type="checkbox"
+                  className="mt-1.5 w-5 h-5 shrink-0 accent-[#1a4aa6]"
+                  checked={checked.has(d.id)}
+                  disabled={na}
+                  onChange={() => toggleDoc(d.id)}
+                  aria-label={`${d.name} 챙김`}
+                />
+                <span className="block">
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className={`font-extrabold text-brand-900 ${checked.has(d.id) ? 'line-through opacity-60' : ''}`}>{d.name}</span>
+                    <span className={d.level === 'required' ? 'chip-warm' : d.level === 'maybe' ? 'chip' : 'chip-gray'}>{LEVEL_LABEL[d.level]}</span>
+                  </span>
+                  <span className="block num text-lg text-brand-700">{d.qty}</span>
+                  <span className="block text-sm text-gray-700">{d.reason}</span>
+                  {d.details.length > 0 && !na && (
+                    <ul className="text-sm text-gray-500 list-disc pl-5 mt-1">
+                      {d.details.map((x) => (
+                        <li key={x}>{x}</li>
+                      ))}
+                    </ul>
+                  )}
+                </span>
+              </label>
+            )
+          })}
+        </div>
+        <div className="bg-surface rounded-2xl p-4 mt-4">
+          <p className="font-bold text-gray-700 mb-1">유의사항</p>
+          <ul className="text-sm text-gray-600 space-y-1">
+            {docNotes.map((n) => (
+              <li key={n.text} className={n.highlight ? 'font-bold text-warm-600' : ''}>
+                {n.highlight ? '★ ' : '• '}
+                {n.text}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <button className="btn-ghost w-full mt-4" onClick={() => setShowSummary(true)}>
+          📄 상담 요약 저장·인쇄하기
+        </button>
+        <p className="text-xs text-gray-400 mt-2">서류 종류와 부수는 신청 시점의 공사 안내에 따라 달라질 수 있어요. (사전 상담 참고용)</p>
+      </div>
+    ),
+  })
+
   // 8) 자녀세대 전용
   if (isChild) {
     slides.push({
@@ -371,7 +507,8 @@ export default function FindResult({ input, onRestart }: { input: FindInput; onR
         </p>
         <div className="grid gap-3 max-w-sm mx-auto">
           <Link to="/consult" className="btn-accent">📅 상담 예약하기</Link>
-          <Link to="/chat" className="btn-primary">💬 챗봇에게 물어보기</Link>
+          <button className="btn-primary" onClick={() => setShowSummary(true)}>📄 상담 요약 저장·인쇄하기</button>
+          <Link to="/chat" className="btn-ghost">💬 챗봇에게 물어보기</Link>
           <button className="btn-ghost" onClick={onRestart}>🔄 처음부터 다시 입력</button>
         </div>
       </div>
@@ -380,14 +517,17 @@ export default function FindResult({ input, onRestart }: { input: FindInput; onR
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-extrabold text-brand-900">맞춤 추천 결과</h1>
-        <button className="text-sm font-bold text-brand-600 hover:underline" onClick={onRestart}>
-          ← 입력으로 돌아가기
-        </button>
-      </div>
-      <div className="card">
-        <SlideDeck slides={slides} />
+      {summaryView}
+      <div className={showSummary ? 'hidden' : ''}>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-xl font-extrabold text-brand-900">맞춤 추천 결과</h1>
+          <button className="text-sm font-bold text-brand-600 hover:underline" onClick={onRestart}>
+            ← 입력으로 돌아가기
+          </button>
+        </div>
+        <div className="card">
+          <SlideDeck slides={slides} />
+        </div>
       </div>
     </div>
   )

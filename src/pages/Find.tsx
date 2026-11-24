@@ -210,6 +210,23 @@ export default function Find() {
         ),
       },
       {
+        key: 'ownership',
+        label: '소유·담보 방식',
+        node: (
+          <Q title="집은 누구 명의이고, 어떤 방식으로 맡기실래요?" hint="제출서류가 이 선택에 따라 달라져요. 아직 모르면 '정하지 않음'을 고르세요.">
+            <Opt on={input.ownership === 'single'} onClick={() => set('ownership', 'single')} title="단독 명의예요" />
+            <Opt on={input.ownership === 'joint'} onClick={() => set('ownership', 'joint')} title="부부 공동 명의예요" desc="공동소유면 서류를 부부가 각각 준비해야 해요." />
+            <p className="font-bold text-sm text-gray-600 mt-2">담보를 맡기는 방식</p>
+            <Opt on={input.collateral === 'mortgage'} onClick={() => set('collateral', 'mortgage')} title="저당권방식" desc="소유권은 그대로 두고 담보(저당권)만 설정해요." />
+            <Opt on={input.collateral === 'trust'} onClick={() => set('collateral', 'trust')} title="신탁방식" desc="공사에 신탁해 두는 방식으로, 배우자 승계가 자동이에요." />
+            <Opt on={input.collateral === 'undecided'} onClick={() => set('collateral', 'undecided')} title="아직 정하지 않았어요" />
+            <p className="font-bold text-sm text-gray-600 mt-2">해당되면 체크해 주세요</p>
+            <Opt on={input.overseas} onClick={() => set('overseas', !input.overseas)} title="재외국민이에요" />
+            <Opt on={input.rental} onClick={() => set('rental', !input.rental)} title="집을 임대 중이거나 임대할 계획이 있어요" />
+          </Q>
+        ),
+      },
+      {
         key: 'residence',
         label: '거주 요건',
         node: (
@@ -320,7 +337,7 @@ export default function Find() {
 
   if (done) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4 py-8 print-only-wrap">
         <FindResult
           key={deckKey}
           input={input}

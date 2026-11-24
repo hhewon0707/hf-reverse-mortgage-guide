@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
-    <footer className="bg-brand-900 text-brand-100 mt-16">
+    <footer className="no-print bg-brand-900 text-brand-100 mt-16">
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="bg-white/10 rounded-2xl p-4 mb-8 border-l-4 border-warm-400">
           <p className="text-sm text-warm-100 font-bold mb-1">⚠️ 면책 안내</p>

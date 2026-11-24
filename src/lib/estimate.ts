@@ -28,6 +28,10 @@ export interface FindInput {
   bequest: Bequest
   concerns: Concern[]
   concernOther: string
+  ownership: 'single' | 'joint'
+  collateral: 'mortgage' | 'trust' | 'undecided'
+  overseas: boolean
+  rental: boolean
 }
 
 export const DEFAULT_INPUT: FindInput = {
@@ -49,6 +53,10 @@ export const DEFAULT_INPUT: FindInput = {
   bequest: 'neutral',
   concerns: [],
   concernOther: '',
+  ownership: 'single',
+  collateral: 'undecided',
+  overseas: false,
+  rental: false,
 }
 
 export const EFFECTIVE_DATE = '2026-06'
