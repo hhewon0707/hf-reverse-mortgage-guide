@@ -15,7 +15,7 @@ const FAQ_TOP5 = [
 
 const features = [
   { to: '/find', icon: '🧭', title: 'AI 맞춤 상담', desc: '질문에 답하면 내게 맞는 상품·지급방식을 비교해 드려요.', tag: '핵심' },
-  { to: '/chat', icon: '💬', title: '질문하기', desc: '궁금한 점을 바로 물어보세요. 근거와 함께 답해요.', tag: '' },
+  { to: '/chat', icon: '💬', title: 'HF주택연금 비서', desc: '주택연금에 대해 궁금한 점을 AI 비서에게 바로 물어보세요.', tag: 'AI' },
   { to: '/status', icon: '📍', title: '진행 현황', desc: '내 신청이 어디까지 왔는지, 언제 끝나는지 확인해요.', tag: '' },
   { to: '/consult', icon: '📅', title: '상담 예약', desc: '방문·전화·화상 중 편한 방법으로 예약해요.', tag: '' },
 ]

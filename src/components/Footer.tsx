@@ -23,7 +23,7 @@ export default function Footer() {
             <h3 className="font-bold text-white mb-2">바로가기</h3>
             <ul className="space-y-1">
               <li><Link to="/find" className="hover:text-white">AI 맞춤 상담</Link></li>
-              <li><Link to="/chat" className="hover:text-white">질문하기</Link></li>
+              <li><Link to="/chat" className="hover:text-white">HF주택연금 비서</Link></li>
               <li><Link to="/consult" className="hover:text-white">상담 예약</Link></li>
               <li><Link to="/status" className="hover:text-white">진행 현황</Link></li>
             </ul>

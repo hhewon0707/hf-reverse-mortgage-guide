@@ -508,7 +508,7 @@ export default function FindResult({ input, onRestart }: { input: FindInput; onR
         <div className="grid gap-3 max-w-sm mx-auto">
           <Link to="/consult" className="btn-accent">📅 상담 예약하기</Link>
           <button className="btn-primary" onClick={() => setShowSummary(true)}>📄 상담 요약 저장·인쇄하기</button>
-          <Link to="/chat" className="btn-ghost">💬 챗봇에게 물어보기</Link>
+          <Link to="/chat" className="btn-ghost">💬 HF주택연금 비서에게 물어보기</Link>
           <button className="btn-ghost" onClick={onRestart}>🔄 처음부터 다시 입력</button>
         </div>
       </div>
